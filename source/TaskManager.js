@@ -15,13 +15,16 @@ module.exports = class {
 			var tasks = [].concat( this.tasks );
 			var newTasks = [];
 
+			this.currentTime = _.now();
+			var delta = this.currentTime - this.lastTime;
+
 			this.running = true;
 
 			_.map( tasks, ( task ) => {
 
 				this.currentTask = task;
 
-				var output = task( this.frame );
+				var output = task( this.frame, delta );
 
 				if ( output !== false ) {
 
@@ -40,6 +43,7 @@ module.exports = class {
 
 			this.addedTasks = [];
 			this.removedTasks = [];
+			this.lastTime = this.currentTime;
 
 			requestAnimationFrame( this.run );
 
@@ -49,6 +53,7 @@ module.exports = class {
 
 	start() {
 
+		this.lastTime = _.now();
 		requestAnimationFrame( this.run );
 
 	}

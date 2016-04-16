@@ -5,6 +5,7 @@ var KeyManager = require( './KeyManager' );
 var CameraManager = require( './CameraManager' );
 var Skybox = require( './Skybox' );
 var Terrain = require( './Terrain' );
+var Scaff = require( './Scaff' );
 
 
 module.exports = class {
@@ -34,59 +35,68 @@ module.exports = class {
 		this.depth = 32;
 
 		this.SIZE = 1;
+		this.HEIGHT = 10;
 
-		var geometry = new THREE.BoxBufferGeometry( this.SIZE, this.SIZE, this.SIZE );
-		var cubeMaterial = new THREE.MeshPhongMaterial( {
+		var geometry = new THREE.BoxBufferGeometry( this.SIZE, this.SIZE * this.HEIGHT, this.SIZE );
+		var darkCubeMaterial = new THREE.MeshLambertMaterial( {
 			color: 0x2d2d2d,
-			specular: 0xffffff,
-			shininess: 0.75,
-			shading: THREE.FlatShading,
-			vertexColors: THREE.VertexColors
+			shading: THREE.FlatShading
+		} );
+		var lavaMaterial = new THREE.MeshLambertMaterial( {
+			color: 0xfd2d6d,
+			shading: THREE.FlatShading
+		} );
+		this.hoverMaterial = new THREE.MeshLambertMaterial( {
+			color: 0x3dfd6d,
+			shading: THREE.FlatShading
 		} );
 
-		// this.terrain = new Terrain( this.width );
-		// this.terrain.generate( 0.001 );
+		this.tiles = [];
 
 		for ( let x = 0; x < this.width; x++ ) {
 
+			var row = [];
+
 			for ( let z = 0; z < this.depth; z++ ) {
 
-				var mesh = new THREE.Mesh( geometry, cubeMaterial );
+				var height = Math.floor( Math.random() * 3 );
+
+				var mesh = new THREE.Mesh( geometry, Math.random() > 0.8 ? lavaMaterial : darkCubeMaterial );
 				mesh.position.x = x * this.SIZE;
 				mesh.position.z = z * this.SIZE;
-				mesh.position.y = 0; //this.terrain.get( x, z );
+				mesh.position.y = height - 0.1 * ( ( x + z ) % 2 ) - this.HEIGHT / 2 - 0.5;
 				this.scene.add( mesh );
 
+				row.push( {
+
+					mesh: mesh,
+					height: height,
+					objects: []
+
+				} );
+
 			}
+
+			this.tiles.push( row );
 
 		}
 
-		var loader = new THREE.JSONLoader();
-		// load a resource
-		loader.load(
-			// resource URL
-			'lib/models/scaff.json',
-			// Function when resource is loaded
-			geometry => {
-
-				var material = new THREE.MeshPhongMaterial( {
-					color: 0x2d2d2d,
-					specular: 0xffffff,
-					shininess: 0.75,
-					shading: THREE.FlatShading,
-					vertexColors: THREE.VertexColors
-				} );
-
-				var object = new THREE.Mesh( geometry, material );
-				object.position.x = 16;
-				object.position.y = 1;
-				object.position.z = 16;
-				this.scene.add( object );
-			}
-		);
+		this.scaff = new Scaff( this );
 
 		this.skybox = new Skybox( this, 'skybox-' );
 		this.scene.add( this.skybox.mesh );
+
+	}
+
+	getTile( x, z ) {
+
+		return this.tiles[ x ][ z ];
+
+	}
+
+	markTile( x, z ) {
+
+		this.tiles[ x ][ z ].mesh.material = this.hoverMaterial;
 
 	}
 
@@ -101,17 +111,19 @@ module.exports = class {
 
 	setupRenderer() {
 
-		this.renderer = new THREE.WebGLRenderer();
+		this.renderer = new THREE.WebGLRenderer( {
+			antialias: true
+		} );
 		this.renderer.setPixelRatio( window.devicePixelRatio );
 		this.renderer.setSize( window.innerWidth, window.innerHeight );
 		$( '#container' ).append( this.renderer.domElement );
-		window.addEventListener( 'resize', this.onWindowResize, false );
+		window.addEventListener( 'resize', this.onWindowResize.bind( this ), false );
 
 	}
 
 	setupLighting() {
 
-		this.sun = new THREE.DirectionalLight( 0xefffef, 1 );
+		this.sun = new THREE.DirectionalLight( 0xffffef, 1 );
 		this.sun.position.set( -600, 300, 400 );
 		this.scene.add( this.sun );
 

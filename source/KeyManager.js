@@ -43,11 +43,17 @@ module.exports = class {
 	addTask( key ) {
 
 		var keyDown = this.keys[ key ],
-			keyTask = this.keyTasks[ key ];
+			keyData = this.keyTasks[ key ];
 
-		if ( !keyDown && keyTask ) {
+		if ( keyData.onPress ) {
 
-			this.world.taskManager.addTask( keyTask );
+			keyData.onPress();
+
+		}
+
+		if ( !keyDown && keyData ) {
+
+			this.world.taskManager.addTask( keyData.onPressing );
 
 		}
 		this.keys[ key ] = true;
@@ -57,11 +63,17 @@ module.exports = class {
 	removeTask( key ) {
 
 		var keyDown = this.keys[ key ],
-			keyTask = this.keyTasks[ key ];
+			keyData = this.keyTasks[ key ];
 
-		if ( keyDown && keyTask ) {
+		if ( keyData.onRelease ) {
 
-			this.world.taskManager.removeTask( keyTask );
+			keyData.onRelease();
+
+		}
+
+		if ( keyDown && keyData ) {
+
+			this.world.taskManager.removeTask( keyData.onPressing );
 
 		}
 		this.keys[ key ] = false;
@@ -76,7 +88,7 @@ module.exports = class {
 
 	}
 
-	addKeyBinding( input, task ) {
+	addKeyBinding( input, onPressing, onPress, onRelease ) {
 
 		var keys = input;
 
@@ -88,7 +100,13 @@ module.exports = class {
 
 		_.map( keys, ( key ) => {
 
-			this.keyTasks[ this.formatKey( key ) ] = task;
+			this.keyTasks[ this.formatKey( key ) ] = {
+
+				onPressing: onPressing,
+				onPress: onPress,
+				onRelease: onRelease
+
+			};
 
 		} );
 
