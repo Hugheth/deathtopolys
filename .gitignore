@@ -1,0 +1,6 @@
+tools/
+node_modules
+npm-debug.log
+bin/
+three.js-master
+*.zip
