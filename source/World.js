@@ -3,11 +3,11 @@
 var TaskManager = require( './TaskManager' );
 var KeyManager = require( './KeyManager' );
 var CameraManager = require( './CameraManager' );
+var ModelManager = require( './ModelManager' );
 var Skybox = require( './Skybox' );
 var Terrain = require( './Terrain' );
 var Scaff = require( './Scaff' );
 var Struct = require( './Struct' );
-
 
 module.exports = class {
 
@@ -19,8 +19,12 @@ module.exports = class {
 		this.setupLighting();
 
 		this.taskManager.start();
+		this.modelManager.load().then( () => {
 
-		this.animate();
+			this.initModels();
+			this.animate();
+
+		} );
 
 	}
 
@@ -29,6 +33,7 @@ module.exports = class {
 		this.taskManager = new TaskManager( this );
 		this.keyManager = new KeyManager( this );
 		this.cameraManager = new CameraManager( this );
+		this.modelManager = new ModelManager( this );
 
 		this.scene = new THREE.Scene();
 
@@ -40,16 +45,16 @@ module.exports = class {
 
 		var geometry = new THREE.BoxBufferGeometry( this.SIZE, this.SIZE * this.HEIGHT, this.SIZE );
 		var darkCubeMaterial = new THREE.MeshLambertMaterial( {
-			color: 0x2d2d2d,
-			shading: THREE.FlatShading
+			color: 0xaaaaaa
+		} );
+		var darkCubeMaterial2 = new THREE.MeshLambertMaterial( {
+			color: 0x999999
 		} );
 		var lavaMaterial = new THREE.MeshLambertMaterial( {
-			color: 0xfd2d6d,
-			shading: THREE.FlatShading
+			color: 0xfd2d6d
 		} );
 		this.hoverMaterial = new THREE.MeshLambertMaterial( {
-			color: 0x3dfd6d,
-			shading: THREE.FlatShading
+			color: 0x3dfd6d
 		} );
 
 		this.tiles = [];
@@ -62,7 +67,7 @@ module.exports = class {
 
 				var height = Math.floor( Math.pow( Math.random(), 6 ) * 3 );
 
-				var mesh = new THREE.Mesh( geometry, Math.random() > 0.8 ? lavaMaterial : darkCubeMaterial );
+				var mesh = new THREE.Mesh( geometry, Math.random() > 0.8 ? lavaMaterial : ( ( x + z ) % 2 ? darkCubeMaterial : darkCubeMaterial2 ) );
 				mesh.position.x = x * this.SIZE;
 				mesh.position.z = z * this.SIZE;
 				mesh.position.y = height - 0.1 * ( ( x + z ) % 2 ) - this.HEIGHT / 2 - 0.5;
@@ -82,10 +87,14 @@ module.exports = class {
 
 		}
 
-		this.scaff = new Scaff( this );
-
 		this.skybox = new Skybox( this, 'skybox-' );
 		this.scene.add( this.skybox.mesh );
+
+	}
+
+	initModels() {
+
+		this.scaff = new Scaff( this );
 
 	}
 
@@ -97,7 +106,7 @@ module.exports = class {
 
 			if ( object.position.y <= pos.y ) {
 
-				low = Math.max( low, pos.y );
+				low = Math.max( low, object.position.y + 1 );
 
 			}
 		} );
@@ -109,9 +118,10 @@ module.exports = class {
 	addStruct( pos ) {
 
 		var drop = this.getDrop( pos );
-		if ( drop > 0 ) {
+		if ( drop >= 0 ) {
 
 			this.getTile( pos.x, pos.z ).objects.push( new Struct( this, pos ) );
+			return true;
 
 		} else {
 			console.log( "Skipping due to drop" );
@@ -133,9 +143,7 @@ module.exports = class {
 
 	onWindowResize() {
 
-		this.cameraManager.camera.aspect = window.innerWidth / window.innerHeight;
-		this.cameraManager.camera.updateProjectionMatrix();
-		// this.cameraManager.resizeWindow( window.innerWidth, window.innerHeight );
+		this.cameraManager.resizeWindow( window.innerWidth, window.innerHeight );
 		this.renderer.setSize( window.innerWidth, window.innerHeight );
 
 	}

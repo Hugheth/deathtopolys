@@ -13,7 +13,7 @@ module.exports = class {
 		var textureCube = new THREE.ImageUtils.loadTextureCube( urls );
 		textureCube.format = THREE.RGBFormat;
 
-		const SIZE = world.SIZE * world.width * 2;
+		const SIZE = world.SIZE * world.width * 20;
 
 		var geometry = new THREE.BoxGeometry( SIZE, SIZE, SIZE );
 

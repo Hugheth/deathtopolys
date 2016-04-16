@@ -16,7 +16,7 @@ module.exports = class {
 
 		this.world = world;
 
-		this.metal = 5;
+		this.setMetal( 20 );
 		this.speed = 300;
 
 		this.LEFT = [ 37, 'A' ];
@@ -25,38 +25,31 @@ module.exports = class {
 		this.DOWN = [ 40, 'S' ];
 		this.SPACE = [ 32 ];
 
-		this.loadMesh();
+		this.initMesh();
+		this.initKeys();
 
 	}
 
-	loadMesh() {
+	setMetal( metal ) {
 
-		var loader = new THREE.JSONLoader();
-		// load a resource
-		loader.load(
-			// resource URL
-			'lib/models/scaff.json',
-			// Function when resource is loaded
-			geometry => {
+		this.metal = metal;
+		$( '#metal' ).html( metal + ' metal' );
 
-				var material = new THREE.MeshPhongMaterial( {
-					color: 0xfdfd2d,
-					specular: 0xffffff,
-					shininess: 0.75,
-					shading: THREE.FlatShading,
-					vertexColors: THREE.VertexColors
-				} );
+	}
 
-				this.mesh = new THREE.Mesh( geometry, material );
-				this.mesh.position.x = 16;
-				this.mesh.position.y = 3;
-				this.mesh.position.z = 16;
-				this.world.scene.add( this.mesh );
+	initMesh() {
 
-				this.initKeys();
+		var material = new THREE.MeshPhongMaterial( {
+			color: 0xfdfd2d,
+			specular: 0xffffff,
+			shininess: 0.75,
+			shading: THREE.FlatShading,
+			vertexColors: THREE.VertexColors
+		} );
 
-			}
-		);
+		this.mesh = new THREE.Mesh( this.world.modelManager.get( 'scaff' ), material );
+		this.mesh.position.set( 16, this.world.getTile( 16, 16 ).height, 16 );
+		this.world.scene.add( this.mesh );
 
 	}
 
@@ -80,7 +73,7 @@ module.exports = class {
 
 		var target = this.position.clone().add( moveIn );
 		var drop = this.world.getDrop( target );
-		if ( drop <= 0 ) return;
+		if ( drop < 0 ) return;
 
 		this.state = this.MOVING;
 
@@ -105,8 +98,10 @@ module.exports = class {
 			if ( this.spewing && this.metal > 0 ) {
 
 				// Add struct
-				this.world.addStruct( this.mesh.position.clone().add( new THREE.Vector3( 0, -1, 0 ) ) );
-				this.metal--;
+				var placed = this.world.addStruct( this.mesh.position.clone().add( new THREE.Vector3( 0, -1, 0 ) ) );
+				if ( placed ) {
+					this.setMetal( this.metal - 1 );
+				}
 				// Mark tile
 				this.world.markTile( this.mesh.position.x, this.mesh.position.z );
 
@@ -144,8 +139,6 @@ module.exports = class {
 
 		this.spewing = true;
 
-		this.metal--;
-
 		this.position = this.mesh.position.clone();
 		this.rotation = this.mesh.rotation.clone();
 		this.targetPosition = new THREE.Vector3( 0, 1, 0 );
@@ -165,7 +158,10 @@ module.exports = class {
 			this.state = this.STOPPED;
 
 			// Add struct
-			this.world.addStruct( this.position );
+			var placed = this.world.addStruct( this.position );
+			if ( placed ) {
+				this.setMetal( this.metal - 1 );
+			}
 
 			// Mark tile
 			this.world.markTile( this.mesh.position.x, this.mesh.position.z );

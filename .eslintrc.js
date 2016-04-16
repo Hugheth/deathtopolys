@@ -17,7 +17,8 @@ module.exports = {
 		"THREE": true,
 		"$": true,
 		"_": true,
-		"Uint8Array": true
+		"Uint8Array": true,
+		"Promise": true,
 	},
 	"extends": "eslint:recommended",
 	"rules": {
@@ -27,10 +28,6 @@ module.exports = {
 		],
 		"no-unused-vars": 1,
 		"no-console": 0,
-		"linebreak-style": [
-			"error",
-			"windows"
-		],
 		"semi": [
 			"error",
 			"always"

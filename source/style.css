@@ -15,3 +15,14 @@ body {
 a {
   color: #a06851;
 }
+#hud {
+	position: absolute;
+	font-size: 20px;
+	color: #fff;
+	background: rgba(0, 0, 0, 0.5);
+	font-weight: bold;
+	top: 0;
+	left: 0;
+	font-family: Verdana;
+	padding: 10px;
+}

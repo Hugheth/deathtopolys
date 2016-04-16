@@ -45,7 +45,7 @@ module.exports = class {
 		var keyDown = this.keys[ key ],
 			keyData = this.keyTasks[ key ];
 
-		if ( keyData.onPress ) {
+		if ( keyData && keyData.onPress ) {
 
 			keyData.onPress();
 
@@ -65,7 +65,7 @@ module.exports = class {
 		var keyDown = this.keys[ key ],
 			keyData = this.keyTasks[ key ];
 
-		if ( keyData.onRelease ) {
+		if ( keyData && keyData.onRelease ) {
 
 			keyData.onRelease();
 
