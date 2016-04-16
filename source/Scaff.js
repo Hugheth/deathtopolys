@@ -1,7 +1,6 @@
 'use strict';
 
 var Lerper = require( './Lerper' );
-var Struct = require( './Struct' );
 
 module.exports = class {
 
@@ -74,11 +73,16 @@ module.exports = class {
 	move( x, z ) {
 
 		if ( this.state !== this.STOPPED ) return;
-		this.state = this.MOVING;
 
 		this.position = this.mesh.position.clone();
 		this.rotation = this.mesh.rotation.clone();
-		this.targetPosition = new THREE.Vector3( x, 0, z );
+		var moveIn = new THREE.Vector3( x, 0, z );
+
+		var target = this.position.clone().add( moveIn );
+		var drop = this.world.getDrop( target );
+		if ( drop <= 0 ) return;
+
+		this.state = this.MOVING;
 
 		var modZ = Math.round( ( this.mesh.rotation.x / Math.PI * 2 ) ) % 4;
 		var rZ = [ -x, x, x, -x ][ modZ ];
@@ -87,7 +91,7 @@ module.exports = class {
 
 		var lerp = new Lerper( this.world.taskManager, this.speed, value => {
 
-			this.mesh.position.copy( this.position.clone().add( this.targetPosition.clone().multiplyScalar( value ) ) );
+			this.mesh.position.copy( this.position.clone().add( moveIn.clone().multiplyScalar( value ) ) );
 			this.mesh.rotation.x = this.rotation.x + this.targetRotation.x * value * Math.PI / 2;
 			this.mesh.rotation.y = this.rotation.y + this.targetRotation.y * value * Math.PI / 2;
 			this.mesh.rotation.z = this.rotation.z + this.targetRotation.z * value * Math.PI / 2;
@@ -101,7 +105,7 @@ module.exports = class {
 			if ( this.spewing && this.metal > 0 ) {
 
 				// Add struct
-				new Struct( this.world, this.mesh.position.clone().add( new THREE.Vector3( 0, -1, 0 ) ) );
+				this.world.addStruct( this.mesh.position.clone().add( new THREE.Vector3( 0, -1, 0 ) ) );
 				this.metal--;
 				// Mark tile
 				this.world.markTile( this.mesh.position.x, this.mesh.position.z );
@@ -161,7 +165,7 @@ module.exports = class {
 			this.state = this.STOPPED;
 
 			// Add struct
-			new Struct( this.world, this.position );
+			this.world.addStruct( this.position );
 
 			// Mark tile
 			this.world.markTile( this.mesh.position.x, this.mesh.position.z );
@@ -173,9 +177,7 @@ module.exports = class {
 
 	fall() {
 
-		var floor = this.world.getBaseHeight( this.mesh.position.x, this.mesh.position.z );
-
-		var drop = this.mesh.position.y - floor;
+		var drop = this.world.getDrop( this.mesh.position );
 
 		if ( drop <= 0 ) return;
 

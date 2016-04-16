@@ -6,6 +6,7 @@ var CameraManager = require( './CameraManager' );
 var Skybox = require( './Skybox' );
 var Terrain = require( './Terrain' );
 var Scaff = require( './Scaff' );
+var Struct = require( './Struct' );
 
 
 module.exports = class {
@@ -59,7 +60,7 @@ module.exports = class {
 
 			for ( let z = 0; z < this.depth; z++ ) {
 
-				var height = Math.floor( Math.random() * 3 );
+				var height = Math.floor( Math.pow( Math.random(), 6 ) * 3 );
 
 				var mesh = new THREE.Mesh( geometry, Math.random() > 0.8 ? lavaMaterial : darkCubeMaterial );
 				mesh.position.x = x * this.SIZE;
@@ -85,6 +86,36 @@ module.exports = class {
 
 		this.skybox = new Skybox( this, 'skybox-' );
 		this.scene.add( this.skybox.mesh );
+
+	}
+
+	getDrop( pos ) {
+
+		var tile = this.getTile( pos.x, pos.z );
+		var low = tile.height;
+		_.each( tile.objects, object => {
+
+			if ( object.position.y <= pos.y ) {
+
+				low = Math.max( low, pos.y );
+
+			}
+		} );
+
+		return pos.y - low;
+
+	}
+
+	addStruct( pos ) {
+
+		var drop = this.getDrop( pos );
+		if ( drop > 0 ) {
+
+			this.getTile( pos.x, pos.z ).objects.push( new Struct( this, pos ) );
+
+		} else {
+			console.log( "Skipping due to drop" );
+		}
 
 	}
 
