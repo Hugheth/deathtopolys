@@ -1,0 +1,32 @@
+{
+  "name": "deathToPolys",
+  "version": "0.0.1",
+  "description": "A Ludum Dare submission",
+  "main": "source/main.js",
+
+  "dependencies": {
+
+    "jquery": "^2.2.3",
+    "lodash": "^3.10.1",
+    "three": "^0.75.0",
+
+  },
+  "engines": {
+    "node": "5.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Hugheth/DeathToPolys"
+  },
+  "keywords": [
+    "node",
+    "heroku",
+    "express"
+  ],
+  "license": "MIT",
+  "devDependencies": {
+    "gulp": "^3.9.1",
+    "webpack": "^1.12.14",
+	"webpack-dev-server": "^1.14.1"
+  }
+}

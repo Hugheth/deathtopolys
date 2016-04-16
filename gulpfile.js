@@ -1,6 +1,9 @@
 var _ = require( 'lodash' );
 var gulp = require( 'gulp' );
-var config = require('./config');
+var config = require( './config' );
+var webpack = require( 'webpack' );
+var WebpackDevServer = require( 'webpack-dev-server' );
+var path = require( 'path' );
 
 var createWebpackCompiler = ( debug ) => {
 
@@ -8,7 +11,7 @@ var createWebpackCompiler = ( debug ) => {
 
 	if ( debug ) {
 
-		config.expandedJs.unshift( "webpack-dev-server/client?http://localhost:" + config.testPort + "/", "webpack/hot/dev-server" );
+		app.unshift( "webpack-dev-server/client?http://localhost:" + config.testPort + "/", "webpack/hot/dev-server" );
 
 	}
 
@@ -16,7 +19,7 @@ var createWebpackCompiler = ( debug ) => {
 
 		entry: {
 
-			app: config.expandedJs
+			app: app
 
 		},
 
@@ -37,45 +40,38 @@ var createWebpackCompiler = ( debug ) => {
 
 gulp.task( 'default', ( done ) => {
 
-	createWebpackCompiler( true ).then( compiler => {
+	var compiler = createWebpackCompiler( true );
 
-		var server = new WebpackDevServer( compiler, {
+	var server = new WebpackDevServer( compiler, {
 
-			contentBase: path.resolve( __dirname, 'bin/client/' ),
-			publicPath: 'http://localhost:8088/',
-			hot: true
+		contentBase: path.resolve( __dirname, 'source/' ),
+		publicPath: "http://localhost:" + config.testPort + "/",
+		hot: true
 
-		} );
-		server.listen( 8088 );
+	} );
+	server.listen( config.testPort );
+	done();
+
+
+} );
+
+gulp.task( 'pack', done => {
+
+	var compiler = createWebpackCompiler();
+
+	compiler.run( function( err, stats ) {
+
+		if ( err ) {
+			throw err;
+		}
+
+		var jsonStats = stats.toJson();
+
+		_.each( jsonStats.errors, console.error.bind( console ) );
+		_.each( jsonStats.warnings, console.warn.bind( console ) );
+
 		done();
-
-	} ).catch( err => {
-
-		console.warn( err );
 
 	} );
 
 } );
-
-gulp.task('pack', done => {
-
-  createWebpackCompiler().then( compiler => {
-
-		compiler.run( function( err, stats ) {
-
-			if ( err ) {
-				throw err;
-			}
-
-			var jsonStats = stats.toJson();
-
-			_.each( jsonStats.errors, console.error.bind( console ) );
-			_.each( jsonStats.warnings, console.warn.bind( console ) );
-
-			done();
-
-		} );
-
-	} );
-
-});
