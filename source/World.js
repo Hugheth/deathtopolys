@@ -5,9 +5,10 @@ var KeyManager = require( './KeyManager' );
 var CameraManager = require( './CameraManager' );
 var ModelManager = require( './ModelManager' );
 var Skybox = require( './Skybox' );
-var Terrain = require( './Terrain' );
+// var Terrain = require( './Terrain' );
 var Scaff = require( './Scaff' );
 var Struct = require( './Struct' );
+var Junk = require( './Junk' );
 
 module.exports = class {
 
@@ -77,7 +78,8 @@ module.exports = class {
 
 					mesh: mesh,
 					height: height,
-					objects: []
+					blocks: [],
+					pickups: []
 
 				} );
 
@@ -96,19 +98,31 @@ module.exports = class {
 
 		this.scaff = new Scaff( this );
 
+		var i = 0;
+		while ( i < 20 ) {
+
+			var pos = new THREE.Vector3( Math.floor( Math.random() * 32 ), 10, Math.floor( Math.random() * 32 ) );
+			pos.y = this.getTile( pos.x, pos.z ).height;
+
+			this.addJunk( pos );
+			i++;
+
+		}
+
 	}
 
 	getDrop( pos ) {
 
 		var tile = this.getTile( pos.x, pos.z );
 		var low = tile.height;
-		_.each( tile.objects, object => {
+		_.each( tile.blocks, object => {
 
 			if ( object.position.y <= pos.y ) {
 
 				low = Math.max( low, object.position.y + 1 );
 
 			}
+
 		} );
 
 		return pos.y - low;
@@ -120,7 +134,7 @@ module.exports = class {
 		var drop = this.getDrop( pos );
 		if ( drop >= 0 ) {
 
-			this.getTile( pos.x, pos.z ).objects.push( new Struct( this, pos ) );
+			this.getTile( pos.x, pos.z ).blocks.push( new Struct( this, pos ) );
 			return true;
 
 		} else {
@@ -129,9 +143,34 @@ module.exports = class {
 
 	}
 
+	addJunk( pos ) {
+
+		this.getTile( pos.x, pos.z ).pickups.push( new Junk( this, pos ) );
+
+	}
+
 	getTile( x, z ) {
 
 		return this.tiles[ x ][ z ];
+
+	}
+
+	getPickup( pos ) {
+
+		var currentPickup;
+
+		var tile = this.getTile( pos.x, pos.z );
+		_.each( tile.pickups, pickup => {
+
+			if ( pickup.position.y == pos.y ) {
+
+				currentPickup = pickup;
+
+			}
+
+		} );
+
+		return currentPickup;
 
 	}
 

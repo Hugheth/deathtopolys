@@ -12,7 +12,8 @@ module.exports = class {
 	load() {
 
 		return Promise.all( [
-			this.loadModel( 'scaff' )
+			this.loadModel( 'scaff' ),
+			this.loadModel( 'junk' )
 		] );
 
 	}

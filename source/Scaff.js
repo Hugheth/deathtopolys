@@ -114,10 +114,23 @@ module.exports = class {
 			}
 
 			// Check for below
+			this.checkPickup();
 			this.fall();
 
 		} );
 		lerp.start();
+
+	}
+
+	checkPickup() {
+
+		var pickup = this.world.getPickup( this.mesh.position );
+		if ( pickup ) {
+
+			this.setMetal( this.metal + 5 );
+			pickup.destroy();
+
+		}
 
 	}
 
