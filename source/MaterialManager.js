@@ -44,7 +44,7 @@ module.exports = class {
 			shading: THREE.FlatShading
 		} );
 		this.materials.tower2 = new THREE.MeshPhongMaterial( {
-			color: 0x999999,
+			color: 0x666666,
 			shading: THREE.FlatShading
 		} );
 		this.materials.saved = new THREE.MeshPhongMaterial( {
