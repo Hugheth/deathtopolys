@@ -20,7 +20,6 @@ module.exports = class {
 
 		return Promise.all( [
 
-			this.loadTexture( 'lava' ),
 			this.loadTexture( 'policeTemplate', 'png' )
 
 		] );
