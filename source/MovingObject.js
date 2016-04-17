@@ -29,6 +29,16 @@ module.exports = class {
 
 		this.state = this.MOVING;
 
+		if ( this.rigid ) {
+
+			var tile = this.world.getTile( this.position.x, this.position.z );
+			tile.blocks.splice( _.indexOf( tile.blocks, this ), 1 );
+
+			tile = this.world.getTile( target.x, target.z );
+			tile.blocks.push( this );
+
+		}
+
 		this.world.playSound( 'move.wav' );
 
 		var modZ = Math.round( ( this.mesh.rotation.x / Math.PI * 2 ) ) % 4;

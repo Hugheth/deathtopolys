@@ -88,10 +88,13 @@ module.exports = class extends MovingObject {
 
 			// Check for below
 			this.checkPickup();
+			this.checkDead();
 
 		}, () => {
 
 			this.checkPickup();
+			this.checkDead();
+
 			this.world.playSound( 'land.wav' );
 
 		} );
@@ -180,6 +183,16 @@ module.exports = class extends MovingObject {
 	moveDown() {
 
 		this.move( 0, 1 );
+
+	}
+
+	checkDead() {
+
+		var mark = this.world.getDropMark( this.position );
+
+		if ( mark === 'police' ) {
+			console.log( 'Yo Dead' );
+		}
 
 	}
 

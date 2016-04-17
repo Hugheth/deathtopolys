@@ -9,6 +9,7 @@ module.exports = class extends MovingObject {
 		super();
 
 		this.speed = 800;
+		this.rigid = true;
 
 		this.world = world;
 		this.position = position;
@@ -74,6 +75,28 @@ module.exports = class extends MovingObject {
 				this.wander();
 
 			}
+
+			_.each( this.LOCALS, local => {
+
+				var target = this.position.clone().add( local );
+				var tile = this.world.getTile( target.x, target.z );
+
+				if ( !tile ) {
+					return;
+				}
+
+				_.each( tile.blocks, object => {
+
+					if ( object.type === 'struct' ) {
+
+						object.mesh.material = this.world.materialManager.get( 'police' );
+						object.mark = 'police';
+
+					}
+
+				} );
+
+			} );
 
 		}, () => {
 

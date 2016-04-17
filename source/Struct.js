@@ -7,6 +7,7 @@ module.exports = class {
 		this.world = world;
 		this.position = position;
 		this.initMesh();
+		this.type = 'struct';
 
 	}
 

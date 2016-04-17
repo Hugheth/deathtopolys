@@ -2,12 +2,12 @@
 
 module.exports = class {
 
-	constructor( world, image ) {
+	constructor( world ) {
 
-		var urlPrefix = "lib/img/" + image;
-		var urls = [ urlPrefix + "posx.jpg", urlPrefix + "negx.jpg",
-			urlPrefix + "posy.jpg", urlPrefix + "negy.jpg",
-			urlPrefix + "posz.jpg", urlPrefix + "negz.jpg"
+		var urlPrefix = "lib/img/";
+		var urls = [ urlPrefix + "skybox.png", urlPrefix + "skybox.png",
+			urlPrefix + "skybox.png", urlPrefix + "bottombox.png",
+			urlPrefix + "skybox.png", urlPrefix + "skybox.png"
 		];
 
 		var textureCube = new THREE.ImageUtils.loadTextureCube( urls );

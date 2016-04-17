@@ -6,7 +6,7 @@ var CameraManager = require( './CameraManager' );
 var ModelManager = require( './ModelManager' );
 var MaterialManager = require( './MaterialManager' );
 var Skybox = require( './Skybox' );
-// var Terrain = require( './Terrain' );
+var Terrain = require( './Terrain' );
 var Scaff = require( './Scaff' );
 var Struct = require( './Struct' );
 var Junk = require( './Junk' );
@@ -29,6 +29,7 @@ module.exports = class {
 
 		} ).then( () => {
 
+			this.initTerrain();
 			this.initModels();
 			this.animate();
 
@@ -61,48 +62,6 @@ module.exports = class {
 
 	initModels() {
 
-		var geometry = new THREE.BoxBufferGeometry( this.SIZE, this.SIZE * this.HEIGHT, this.SIZE );
-		var darkCubeMaterial = new THREE.MeshLambertMaterial( {
-			color: 0xaaaaaa
-		} );
-		var darkCubeMaterial2 = new THREE.MeshLambertMaterial( {
-			color: 0x999999
-		} );
-		var lavaMaterial = new THREE.MeshLambertMaterial( {
-			color: 0xfd2d6d
-		} );
-
-		this.tiles = [];
-
-		for ( let x = 0; x < this.width; x++ ) {
-
-			var row = [];
-
-			for ( let z = 0; z < this.depth; z++ ) {
-
-				var height = Math.floor( Math.pow( Math.random(), 6 ) * 3 );
-
-				var mesh = new THREE.Mesh( geometry, Math.random() > 0.8 ? this.materialManager.get( 'lava' ) : ( ( x + z ) % 2 ? darkCubeMaterial : darkCubeMaterial2 ) );
-				mesh.position.x = x * this.SIZE;
-				mesh.position.z = z * this.SIZE;
-				mesh.position.y = height - 0.1 * ( ( x + z ) % 2 ) - this.HEIGHT / 2 - 0.5;
-				this.scene.add( mesh );
-
-				row.push( {
-
-					mesh: mesh,
-					height: height,
-					blocks: [],
-					pickups: []
-
-				} );
-
-			}
-
-			this.tiles.push( row );
-
-		}
-
 		var i = 0;
 		while ( i < 20 ) {
 
@@ -126,6 +85,12 @@ module.exports = class {
 		}
 
 		this.scaff = new Scaff( this );
+
+	}
+
+	initTerrain() {
+
+		this.terrain = new Terrain( this );
 
 	}
 
@@ -228,7 +193,35 @@ module.exports = class {
 
 	markTile( x, z, mark ) {
 
-		this.tiles[ x ][ z ].mesh.material = this.materialManager.get( mark );
+		var tile = this.getTile( x, z );
+		tile.mesh.material = this.materialManager.get( mark );
+		tile.mark = mark;
+
+	}
+
+	getDropMark( pos ) {
+
+		var tile = this.getTile( pos.x, pos.z );
+		var mark = tile.mark;
+
+		if ( !tile ) {
+			return;
+		}
+		var low = -1;
+		_.each( tile.blocks, object => {
+
+			if ( object.position.y <= pos.y ) {
+
+				if ( object.position.y > low ) {
+					low = object.position.y;
+					mark = object.mark;
+				}
+
+			}
+
+		} );
+
+		return mark;
 
 	}
 
