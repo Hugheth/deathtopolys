@@ -242,16 +242,21 @@ module.exports = class {
 
 			while ( currentPos.x !== ring[ 1 ].x + vX ) {
 
+				currentPos.z = ring[ 0 ].z;
+
 				while ( currentPos.z !== ring[ 1 ].z + vZ ) {
 
 					var block = this.getBlock( currentPos );
 					if ( block && block.type === 'struct' ) {
 
-						block.material = this.materialManager.get( 'police' );
+						block.mesh.material = this.materialManager.get( 'saved' );
 						block.mark = 'saved';
 						foundNew = true;
 
 					}
+
+					var tile = this.getTile( currentPos.x, currentPos.z );
+					tile.mesh.material = this.materialManager.get( 'saved' );
 
 					currentPos.z += vZ;
 
@@ -325,11 +330,6 @@ module.exports = class {
 		}
 
 		return this.tiles[ x ][ z ];
-
-	}
-
-	blockAt( pos ) {
-
 
 	}
 

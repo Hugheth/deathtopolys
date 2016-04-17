@@ -41,6 +41,9 @@ module.exports = class {
 		this.materials.tower = new THREE.MeshLambertMaterial( {
 			color: 0xaaaaaa
 		} );
+		this.materials.saved = new THREE.MeshLambertMaterial( {
+			color: 0xaaff00
+		} );
 
 	}
 
