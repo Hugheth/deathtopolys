@@ -32,6 +32,15 @@ module.exports = class {
 		this.materials.police = new THREE.MeshLambertMaterial( {
 			color: 0x3d73ed
 		} );
+		this.materials.floor1 = new THREE.MeshLambertMaterial( {
+			color: 0x333333
+		} );
+		this.materials.floor2 = new THREE.MeshLambertMaterial( {
+			color: 0x222222
+		} );
+		this.materials.tower = new THREE.MeshLambertMaterial( {
+			color: 0xaaaaaa
+		} );
 
 	}
 

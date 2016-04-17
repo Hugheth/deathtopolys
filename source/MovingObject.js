@@ -11,6 +11,14 @@ module.exports = class {
 		this.JUMPING = 2;
 		this.FALLING = 3;
 
+		this.LOCALS = [
+			new THREE.Vector3( 0, 0, 1 ),
+			new THREE.Vector3( 0, 0, -1 ),
+			new THREE.Vector3( 1, 0, 0 ),
+			new THREE.Vector3( -1, 0, 0 )
+
+		];
+
 		this.state = this.STOPPED;
 
 	}
@@ -38,8 +46,6 @@ module.exports = class {
 			tile.blocks.push( this );
 
 		}
-
-		this.world.playSound( 'move.wav' );
 
 		var modZ = Math.round( ( this.mesh.rotation.x / Math.PI * 2 ) ) % 4;
 		var rZ = [ -x, x, x, -x ][ modZ ];

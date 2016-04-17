@@ -28,6 +28,7 @@ module.exports = {
 		],
 		"no-unused-vars": 1,
 		"no-console": 0,
+		"no-constant-condition": 0,
 		"semi": [
 			"error",
 			"always"

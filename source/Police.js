@@ -20,14 +20,6 @@ module.exports = class extends MovingObject {
 		this.animate = this.animate.bind( this );
 		this.world.taskManager.addTask( this.animate );
 
-		this.LOCALS = [
-			new THREE.Vector3( 0, 0, 1 ),
-			new THREE.Vector3( 0, 0, -1 ),
-			new THREE.Vector3( 1, 0, 0 ),
-			new THREE.Vector3( -1, 0, 0 )
-
-		];
-
 		this.wander();
 
 	}

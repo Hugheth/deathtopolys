@@ -1,6 +1,8 @@
+@import url(https://fonts.googleapis.com/css?family=Limelight);
+
 body {
   color: #61443e;
-  font-family:Monospace;
+  font-family:'Limelight', monospace;
   font-size:13px;
   text-align:center;
   background-color: #bfd1e5;
@@ -23,6 +25,5 @@ a {
 	font-weight: bold;
 	top: 0;
 	left: 0;
-	font-family: Verdana;
 	padding: 10px;
 }

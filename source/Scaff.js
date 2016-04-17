@@ -25,6 +25,8 @@ module.exports = class extends MovingObject {
 		this.initMesh();
 		this.initKeys();
 
+		this.dead = false;
+
 	}
 
 	setMetal( metal ) {
@@ -62,6 +64,8 @@ module.exports = class extends MovingObject {
 
 	move( x, z ) {
 
+		if ( this.dead ) return;
+
 		this.doMove( x, z, ( value ) => {
 
 			this.mesh.rotation.x = this.rotation.x + this.targetRotation.x * value * Math.PI / 2;
@@ -70,6 +74,8 @@ module.exports = class extends MovingObject {
 			this.world.cameraManager.updatePosition();
 
 		}, () => {
+
+			this.world.playSound( 'move.wav' );
 
 			if ( this.spewing && this.metal > 0 ) {
 
@@ -89,6 +95,17 @@ module.exports = class extends MovingObject {
 			// Check for below
 			this.checkPickup();
 			this.checkDead();
+
+			var beneath = this.position.clone();
+			beneath.y--;
+
+			var block = this.world.getBlock( beneath );
+
+			if ( block && block.type === 'struct' && block.mask !== 'police' ) {
+
+				this.world.checkStructForRing( block );
+
+			}
 
 		}, () => {
 
@@ -121,6 +138,8 @@ module.exports = class extends MovingObject {
 	}
 
 	spew() {
+
+		if ( this.dead ) return;
 
 		if ( this.state !== this.STOPPED || this.spewing ) {
 
@@ -191,7 +210,10 @@ module.exports = class extends MovingObject {
 		var mark = this.world.getDropMark( this.position );
 
 		if ( mark === 'police' ) {
-			console.log( 'Yo Dead' );
+
+			this.world.playSound( 'gameover.wav' );
+			this.dead = true;
+
 		}
 
 	}

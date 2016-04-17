@@ -121,13 +121,188 @@ module.exports = class {
 		var drop = this.getDrop( pos );
 		if ( drop >= 0 ) {
 
+			var struct = new Struct( this, pos );
+
 			this.playSound( 'spew.wav' );
-			this.getTile( pos.x, pos.z ).blocks.push( new Struct( this, pos ) );
+			this.getTile( pos.x, pos.z ).blocks.push( struct );
+
+			this.checkStructForRing( struct );
+
 			return true;
 
 		} else {
 			console.log( "Skipping due to drop" );
 		}
+
+	}
+
+	checkStructForRing( struct ) {
+
+		var rings = [];
+		var pos = struct.position;
+		let vPos = pos.clone();
+
+		var n = 32;
+		while ( n-- ) {
+
+			vPos.x++;
+			vPos.z = pos.z;
+
+			if ( !this.hasGoodStruct( vPos ) ) {
+
+				break;
+
+			}
+
+			var m = 32;
+			while ( m-- ) {
+
+				vPos.z++;
+				if ( !this.hasGoodStruct( vPos ) ) {
+
+					break;
+
+				}
+
+				this.contributeRing( pos, vPos, 1, 1, rings );
+
+			}
+
+			vPos.z = pos.z;
+
+			m = 32;
+			while ( m-- ) {
+
+				vPos.z--;
+				if ( !this.hasGoodStruct( vPos ) ) {
+
+					break;
+
+				}
+
+				this.contributeRing( pos, vPos, 1, -1, rings );
+
+			}
+
+		}
+
+		vPos.x = pos.x;
+
+		n = 32;
+		while ( n-- ) {
+
+			vPos.x--;
+			vPos.z = pos.z;
+
+			if ( !this.hasGoodStruct( vPos ) ) {
+
+				break;
+
+			}
+
+			let m = 32;
+			while ( m-- ) {
+
+				vPos.z++;
+				if ( !this.hasGoodStruct( vPos ) ) {
+
+					break;
+
+				}
+
+				this.contributeRing( pos, vPos, -1, 1, rings );
+
+			}
+
+			vPos.z = pos.z;
+
+			m = 32;
+			while ( m-- ) {
+
+				vPos.z--;
+				if ( !this.hasGoodStruct( vPos ) ) {
+
+					break;
+
+				}
+
+				this.contributeRing( pos, vPos, -1, -1, rings );
+
+			}
+
+		}
+
+		var foundNew = false;
+
+		_.each( rings, ring => {
+
+			var currentPos = ring[ 0 ].clone();
+			var vX = ring[ 1 ].x > ring[ 0 ].x ? 1 : -1;
+			var vZ = ring[ 1 ].z > ring[ 0 ].z ? 1 : -1;
+
+			while ( currentPos.x !== ring[ 1 ].x + vX ) {
+
+				while ( currentPos.z !== ring[ 1 ].z + vZ ) {
+
+					var block = this.getBlock( currentPos );
+					if ( block && block.type === 'struct' ) {
+
+						block.material = this.materialManager.get( 'police' );
+						block.mark = 'saved';
+						foundNew = true;
+
+					}
+
+					currentPos.z += vZ;
+
+
+				}
+
+				currentPos.x += vX;
+
+			}
+
+		} );
+
+		if ( foundNew ) {
+
+
+		}
+
+	}
+
+	contributeRing( pos, outPos, vX, vZ, rings ) {
+
+		var vPos = outPos.clone();
+
+		while ( vPos.x !== pos.x ) {
+
+			vPos.x -= vX;
+			if ( !this.hasGoodStruct( vPos ) ) {
+
+				return;
+
+			}
+
+			// console.log( 'good at', vPos );
+
+		}
+
+		while ( vPos.z !== pos.z ) {
+
+			vPos.z -= vZ;
+			if ( !this.hasGoodStruct( vPos ) ) {
+
+				return;
+
+			}
+
+			// console.log( 'good at', vPos );
+
+		}
+
+		rings.push( [ pos.clone(), outPos.clone() ] );
+		// console.log( 'Found ring!' );
 
 	}
 
@@ -153,6 +328,11 @@ module.exports = class {
 
 	}
 
+	blockAt( pos ) {
+
+
+	}
+
 	playSound( sound ) {
 
 		var id = sound + _.now();
@@ -161,15 +341,15 @@ module.exports = class {
 		this.playingSounds[ id ].onended = () => {
 			delete this.playingSounds[ id ];
 		};
-		// this.playingSounds[ id ].play();
+		this.playingSounds[ id ].play();
 
 	}
 
 	playMusic() {
 
-		this.music = new Audio( 'lib/audio/music.wav' );
+		this.music = new Audio( 'lib/audio/music.mp3' );
 		this.music.loop = true;
-		// this.music.play();
+		this.music.play();
 	}
 
 	getPickup( pos ) {
@@ -222,6 +402,38 @@ module.exports = class {
 		} );
 
 		return mark;
+
+	}
+
+	hasGoodStruct( pos ) {
+
+		var block = this.getBlock( pos );
+
+		if ( block && block.type === 'struct' && block.mark !== "police" ) {
+
+			return true;
+
+		}
+
+	}
+
+	getBlock( pos ) {
+
+		var block;
+
+		var tile = this.getTile( pos.x, pos.z );
+		_.each( tile.blocks, object => {
+
+			if ( object.position.y === pos.y ) {
+
+				block = object;
+				return false;
+
+			}
+
+		} );
+
+		return block;
 
 	}
 

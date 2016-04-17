@@ -6,18 +6,32 @@ module.exports = class {
 
 		this.world = world;
 		this.initTiles();
+		this.world.taskManager.addTask( this.raise.bind( this ) );
+
+	}
+
+	raise( frame ) {
+
+		if ( frame % 5 ) return;
+
+		var x = Math.floor( Math.random() * this.world.width );
+		var z = Math.floor( Math.random() * this.world.depth );
+
+		var tile = this.world.getTile( x, z );
+
+		if ( tile.pickups.length === 0 && tile.blocks.length === 0 ) {
+
+			tile.height++;
+			tile.mesh.material = this.world.materialManager.get( 'tower' );
+			tile.mesh.position.y = tile.height - 0.1 * ( ( x + z ) % 2 ) - this.world.HEIGHT / 2 - 0.5;
+
+		}
 
 	}
 
 	initTiles() {
 
-		var geometry = new THREE.BoxBufferGeometry( this.SIZE, this.SIZE * this.HEIGHT, this.SIZE );
-		var darkCubeMaterial = new THREE.MeshLambertMaterial( {
-			color: 0xaaaaaa
-		} );
-		var darkCubeMaterial2 = new THREE.MeshLambertMaterial( {
-			color: 0x999999
-		} );
+		var geometry = new THREE.BoxBufferGeometry( this.world.SIZE, this.world.SIZE * this.world.HEIGHT, this.world.SIZE );
 
 		this.world.tiles = [];
 
@@ -30,7 +44,7 @@ module.exports = class {
 				var height = 0;
 				// Math.floor( Math.pow( Math.random(), 6 ) * 3 );
 
-				var mesh = new THREE.Mesh( geometry, ( x + z ) % 2 ? darkCubeMaterial : darkCubeMaterial2 );
+				var mesh = new THREE.Mesh( geometry, ( x + z ) % 2 ? this.world.materialManager.get( 'floor1' ) : this.world.materialManager.get( 'floor2' ) );
 				mesh.position.x = x * this.world.SIZE;
 				mesh.position.z = z * this.world.SIZE;
 				mesh.position.y = height - 0.1 * ( ( x + z ) % 2 ) - this.world.HEIGHT / 2 - 0.5;
