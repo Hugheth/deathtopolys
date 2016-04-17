@@ -14,7 +14,8 @@ module.exports = class {
 		return Promise.all( [
 			this.loadModel( 'scaff' ),
 			this.loadModel( 'junk' ),
-			this.loadModel( 'police' )
+			this.loadModel( 'police' ),
+			this.loadModel( 'tower' )
 		] );
 
 	}

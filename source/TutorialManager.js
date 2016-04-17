@@ -18,7 +18,7 @@ module.exports = class {
 			'See that junk over there? Go pick it up!',
 			'MMMMM Tasty. And shiny too.<br><small>(Cheers THREE.MeshPhongMaterial)</small>',
 			'Some tower blocks have SHIFTED out of the city fabric over there!',
-			'You can capture them by surrounding them in a square of scaffold<br><small>Have you tried holding the SPACEBAR down?</small>',
+			'You can capture them by surrounding them in a rectangle of scaffold<br><small>Have you tried holding the SPACEBAR down?</small>',
 			"Make sure you roll over a corner to ensure capture!<br><small>(You let me down 11:30pm algorithm!!!)</small>",
 			"Your captured buildings will generate more junk for you!",
 			"The taller they are when you capture them the more junk you get...",

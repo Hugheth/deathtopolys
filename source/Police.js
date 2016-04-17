@@ -63,6 +63,8 @@ module.exports = class extends MovingObject {
 
 		this.doMove( moveIn.x, moveIn.z, () => {}, ( unstable ) => {
 
+			if ( this.dead ) return;
+
 			// Mark tile
 			this.world.markTile( this.position.x, this.position.z, 'police' );
 
@@ -80,6 +82,7 @@ module.exports = class extends MovingObject {
 				if ( !tile ) {
 					return;
 				}
+				this.world.markTile( target.x, target.z, 'police' );
 
 				_.each( tile.blocks, object => {
 

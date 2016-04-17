@@ -19,6 +19,8 @@ module.exports = class {
 
 		this.init();
 
+		this.estate = 0;
+
 		this.setupRenderer();
 		this.setupLighting();
 		this.playMusic();
@@ -38,6 +40,13 @@ module.exports = class {
 
 		this.towerTasks = {};
 		this.taskManager.addTask( this.checkTowers.bind( this ) );
+
+		var next = $( '<div id="#retry" class="option">' ).append( 'Reset' ).click( () => {
+
+			document.location.reload();
+
+		} );
+		$( '#hud' ).append( next );
 
 	}
 
@@ -287,20 +296,23 @@ module.exports = class {
 
 						block.mesh.material = this.materialManager.get( 'saved' );
 						block.mark = 'saved';
-						foundNew = true;
 
 					}
 
 					var tile = this.getTile( currentPos.x, currentPos.z );
 
+					this.destroyPolice( currentPos );
+
 					if ( tile.mark !== 'saved' ) {
 
 						tile.mark = 'saved';
+						this.estate++;
+						foundNew = true;
 
 						if ( tile.height ) {
 
 							tile.mesh.material = this.materialManager.get( 'saved' );
-							var time = this.taskManager.frame + Math.floor( Math.random() * 1000 );
+							var time = this.taskManager.frame + Math.floor( Math.random() * 200 );
 							if ( !this.towerTasks[ time ] ) {
 
 								this.towerTasks[ time ] = [];
@@ -341,6 +353,8 @@ module.exports = class {
 
 		if ( foundNew ) {
 
+			this.playSound( 'pop.wav' );
+			$( '#estate' ).html( this.estate + ' estate' );
 
 		}
 
@@ -437,6 +451,7 @@ module.exports = class {
 		this.music = new Audio( 'lib/audio/music.mp3' );
 		this.music.loop = true;
 		this.music.play();
+		this.music.volume = 0.5;
 
 		if ( !localStorage.unlockedMute ) {
 			$( '#mute' ).hide();

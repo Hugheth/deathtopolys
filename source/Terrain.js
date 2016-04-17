@@ -24,16 +24,51 @@ module.exports = class {
 
 		this.raiseTile( x, z );
 
+		if ( frame % 1000 === 0 ) {
+
+			this.placePolice();
+
+		}
+
+	}
+
+	placePolice() {
+
+		var n = 100;
+		while ( n-- ) {
+
+			var x = Math.floor( Math.random() * this.world.width );
+			var z = Math.floor( Math.random() * this.world.depth );
+
+			var tile = this.world.getTile( x, z );
+			if ( tile.mark !== 'saved' ) {
+
+				this.world.addPolice( new THREE.Vector3( x, 0, z ) );
+				break;
+
+			}
+
+		}
+
 	}
 
 	raiseTile( x, z ) {
 
 		var tile = this.world.getTile( x, z );
 
+		if ( tile.mark === 'saved' ) return;
+		if ( tile.height > 8 ) return;
+
 		if ( tile.pickups.length === 0 && tile.blocks.length === 0 ) {
 
+			if ( tile.height === 0 ) {
+
+				tile.mesh.geometry = this.world.modelManager.get( 'tower' );
+
+			}
+
 			tile.height++;
-			tile.mesh.material = this.world.materialManager.get( 'tower' );
+			tile.mesh.material = this.world.materialManager.get( ( x + z ) % 2 ? 'tower' : 'tower2' );
 			tile.mesh.position.y = tile.height - 0.1 * ( ( x + z ) % 2 ) - this.world.HEIGHT / 2 - 0.5;
 
 		}

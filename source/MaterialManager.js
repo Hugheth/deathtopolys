@@ -29,8 +29,9 @@ module.exports = class {
 
 	loadStatic() {
 
-		this.materials.police = new THREE.MeshLambertMaterial( {
-			color: 0x3d73ed
+		this.materials.police = new THREE.MeshPhongMaterial( {
+			color: 0x3d73ed,
+			shading: THREE.FlatShading
 		} );
 		this.materials.floor1 = new THREE.MeshLambertMaterial( {
 			color: 0x333333
@@ -38,11 +39,17 @@ module.exports = class {
 		this.materials.floor2 = new THREE.MeshLambertMaterial( {
 			color: 0x222222
 		} );
-		this.materials.tower = new THREE.MeshLambertMaterial( {
-			color: 0xaaaaaa
+		this.materials.tower = new THREE.MeshPhongMaterial( {
+			color: 0xaaaaaa,
+			shading: THREE.FlatShading
 		} );
-		this.materials.saved = new THREE.MeshLambertMaterial( {
-			color: 0xaaff00
+		this.materials.tower2 = new THREE.MeshPhongMaterial( {
+			color: 0x999999,
+			shading: THREE.FlatShading
+		} );
+		this.materials.saved = new THREE.MeshPhongMaterial( {
+			color: 0xaaff00,
+			shading: THREE.FlatShading
 		} );
 		this.materials.floor3 = new THREE.MeshLambertMaterial( {
 			color: 0x558800

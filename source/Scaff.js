@@ -214,12 +214,16 @@ module.exports = class extends MovingObject {
 
 	checkDead() {
 
+		if ( this.dead ) return;
+
 		var mark = this.world.getDropMark( this.position );
 
 		if ( mark === 'police' ) {
 
 			this.world.playSound( 'gameover.wav' );
 			this.dead = true;
+			$( '#container' ).fadeOut( 5000 );
+			$( '#finalScore' ).fadeIn( 2000 ).append( "You captured " + this.world.estate + " estate" );
 
 		}
 
