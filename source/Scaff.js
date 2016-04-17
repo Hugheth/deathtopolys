@@ -13,7 +13,7 @@ module.exports = class extends MovingObject {
 
 		this.world = world;
 
-		this.setMetal( 20 );
+		this.setMetal( 5 );
 		this.speed = 300;
 
 		this.LEFT = [ 37, 'A' ];
@@ -122,6 +122,13 @@ module.exports = class extends MovingObject {
 
 		var pickup = this.world.getPickup( this.mesh.position );
 		if ( pickup ) {
+
+			if ( !localStorage.unlockedMute ) {
+
+				localStorage.unlockedMute = true;
+				$( '#mute' ).fadeIn( 1000 );
+
+			}
 
 			this.world.playSound( 'pickup.wav' );
 			this.setMetal( this.metal + 5 );

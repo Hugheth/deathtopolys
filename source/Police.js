@@ -8,6 +8,8 @@ module.exports = class extends MovingObject {
 
 		super();
 
+		this.type = 'police';
+
 		this.speed = 800;
 		this.rigid = true;
 
@@ -25,6 +27,8 @@ module.exports = class extends MovingObject {
 	}
 
 	wander() {
+
+		if ( this.dead ) return;
 
 		var wait = Math.random() > 0.8;
 
@@ -110,6 +114,13 @@ module.exports = class extends MovingObject {
 
 		this.mesh.rotation.y += 0.01;
 
+	}
+
+	destroy() {
+
+		this.dead = true;
+		this.world.scene.remove( this.mesh );
+		this.world.taskManager.removeTask( this.animate );
 	}
 
 };

@@ -27,3 +27,38 @@ a {
 	left: 0;
 	padding: 10px;
 }
+
+#hud > * {
+
+	float: left;
+	margin-right: 20px;
+
+}
+
+.option {
+
+	color: #ffff00;
+	cursor: pointer;
+	transition: all 0.15s;
+
+}
+
+.option:hover {
+
+	color: #ffff66;
+	transform: scale(1.2) rotate(5deg);
+
+}
+
+#tutorial {
+	position: absolute;
+    bottom: 60px;
+    width: 80%;
+    padding: 20px;
+    margin-left: 10%;
+    left: 0;
+    box-sizing: border-box;
+    color: #fff;
+    background: rgba(0,0,0,.9);
+    font-size: 20px;
+}

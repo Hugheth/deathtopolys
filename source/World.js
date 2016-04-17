@@ -5,6 +5,7 @@ var KeyManager = require( './KeyManager' );
 var CameraManager = require( './CameraManager' );
 var ModelManager = require( './ModelManager' );
 var MaterialManager = require( './MaterialManager' );
+var TutorialManager = require( './TutorialManager' );
 var Skybox = require( './Skybox' );
 var Terrain = require( './Terrain' );
 var Scaff = require( './Scaff' );
@@ -35,6 +36,37 @@ module.exports = class {
 
 		} );
 
+		this.towerTasks = {};
+		this.taskManager.addTask( this.checkTowers.bind( this ) );
+
+	}
+
+	checkTowers( frame ) {
+
+		var frameTasks = this.towerTasks[ frame ];
+
+		if ( frameTasks ) {
+
+			_.each( frameTasks, position => {
+
+				if ( !this.getPickup( position ) ) {
+
+					this.addJunk( position );
+					var timeToNext = frame + Math.floor( Math.random() * 1000 ) + 1000 - position.y * 200;
+					if ( !this.towerTasks[ timeToNext ] ) {
+						this.towerTasks[ timeToNext ] = [];
+					}
+					this.towerTasks[ timeToNext ].push( position );
+
+				}
+
+
+			} );
+
+			delete this.towerTasks[ frame ];
+
+		}
+
 	}
 
 	init() {
@@ -44,6 +76,7 @@ module.exports = class {
 		this.cameraManager = new CameraManager( this );
 		this.modelManager = new ModelManager( this );
 		this.materialManager = new MaterialManager( this );
+		this.tutorialManager = new TutorialManager( this );
 
 		this.playingSounds = {};
 
@@ -62,29 +95,30 @@ module.exports = class {
 
 	initModels() {
 
-		var i = 0;
-		while ( i < 20 ) {
-
-			let pos = new THREE.Vector3( Math.floor( Math.random() * 32 ), 10, Math.floor( Math.random() * 32 ) );
-			pos.y = this.getTile( pos.x, pos.z ).height;
-
-			this.addJunk( pos );
-			i++;
-
-		}
-
-		var j = 0;
-		while ( j < 20 ) {
-
-			let pos = new THREE.Vector3( Math.floor( Math.random() * 32 ), 10, Math.floor( Math.random() * 32 ) );
-			pos.y = this.getTile( pos.x, pos.z ).height;
-
-			this.addPolice( pos );
-			j++;
-
-		}
+		// var i = 0;
+		// while ( i < 20 ) {
+		//
+		// 	let pos = new THREE.Vector3( Math.floor( Math.random() * 32 ), 10, Math.floor( Math.random() * 32 ) );
+		// 	pos.y = this.getTile( pos.x, pos.z ).height;
+		//
+		// 	this.addJunk( pos );
+		// 	i++;
+		//
+		// }
+		//
+		// var j = 0;
+		// while ( j < 20 ) {
+		//
+		// 	let pos = new THREE.Vector3( Math.floor( Math.random() * 32 ), 10, Math.floor( Math.random() * 32 ) );
+		// 	pos.y = this.getTile( pos.x, pos.z ).height;
+		//
+		// 	this.addPolice( pos );
+		// 	j++;
+		//
+		// }
 
 		this.scaff = new Scaff( this );
+		this.cameraManager.camera.position.copy( this.scaff.mesh.position.clone().add( this.cameraManager.offset ) );
 
 	}
 
@@ -131,7 +165,7 @@ module.exports = class {
 			return true;
 
 		} else {
-			console.log( "Skipping due to drop" );
+			// console.log( "Skipping due to drop" );
 		}
 
 	}
@@ -240,6 +274,8 @@ module.exports = class {
 			var vX = ring[ 1 ].x > ring[ 0 ].x ? 1 : -1;
 			var vZ = ring[ 1 ].z > ring[ 0 ].z ? 1 : -1;
 
+			var area = 0;
+
 			while ( currentPos.x !== ring[ 1 ].x + vX ) {
 
 				currentPos.z = ring[ 0 ].z;
@@ -256,7 +292,35 @@ module.exports = class {
 					}
 
 					var tile = this.getTile( currentPos.x, currentPos.z );
-					tile.mesh.material = this.materialManager.get( 'saved' );
+
+					if ( tile.mark !== 'saved' ) {
+
+						tile.mark = 'saved';
+
+						if ( tile.height ) {
+
+							tile.mesh.material = this.materialManager.get( 'saved' );
+							var time = this.taskManager.frame + Math.floor( Math.random() * 1000 );
+							if ( !this.towerTasks[ time ] ) {
+
+								this.towerTasks[ time ] = [];
+
+							}
+							this.towerTasks[ time ].push( new THREE.Vector3( currentPos.x, tile.height, currentPos.z ) );
+
+						} else if ( ( currentPos.x + currentPos.z ) % 2 ) {
+
+							tile.mesh.material = this.materialManager.get( 'floor3' );
+
+						} else {
+
+							tile.mesh.material = this.materialManager.get( 'floor4' );
+
+						}
+
+					}
+
+					area++;
 
 					currentPos.z += vZ;
 
@@ -264,6 +328,12 @@ module.exports = class {
 				}
 
 				currentPos.x += vX;
+
+			}
+
+			if ( area === this.width * this.depth ) {
+
+				alert( "YOU WON!" );
 
 			}
 
@@ -311,6 +381,21 @@ module.exports = class {
 
 	}
 
+	destroyPolice( pos ) {
+
+		var tile = this.getTile( pos.x, pos.z );
+		_.each( tile.blocks, object => {
+
+			if ( object.type === 'police' ) {
+
+				object.destroy();
+
+			}
+
+		} );
+
+	}
+
 	addJunk( pos ) {
 
 		this.getTile( pos.x, pos.z ).pickups.push( new Junk( this, pos ) );
@@ -337,6 +422,8 @@ module.exports = class {
 
 		var id = sound + _.now();
 
+		if ( this.mute ) return;
+
 		this.playingSounds[ id ] = new Audio( 'lib/audio/' + sound );
 		this.playingSounds[ id ].onended = () => {
 			delete this.playingSounds[ id ];
@@ -350,6 +437,18 @@ module.exports = class {
 		this.music = new Audio( 'lib/audio/music.mp3' );
 		this.music.loop = true;
 		this.music.play();
+
+		if ( !localStorage.unlockedMute ) {
+			$( '#mute' ).hide();
+		}
+
+		$( '#mute' ).click( () => {
+
+			this.mute = true;
+			$( '#mute' ).hide();
+			this.music.pause();
+
+		} );
 	}
 
 	getPickup( pos ) {
@@ -436,6 +535,7 @@ module.exports = class {
 		return block;
 
 	}
+
 
 	onWindowResize() {
 

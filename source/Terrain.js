@@ -6,6 +6,11 @@ module.exports = class {
 
 		this.world = world;
 		this.initTiles();
+
+	}
+
+	start() {
+
 		this.world.taskManager.addTask( this.raise.bind( this ) );
 
 	}
@@ -16,6 +21,12 @@ module.exports = class {
 
 		var x = Math.floor( Math.random() * this.world.width );
 		var z = Math.floor( Math.random() * this.world.depth );
+
+		this.raiseTile( x, z );
+
+	}
+
+	raiseTile( x, z ) {
 
 		var tile = this.world.getTile( x, z );
 

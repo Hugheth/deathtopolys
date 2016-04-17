@@ -44,6 +44,12 @@ module.exports = class {
 		this.materials.saved = new THREE.MeshLambertMaterial( {
 			color: 0xaaff00
 		} );
+		this.materials.floor3 = new THREE.MeshLambertMaterial( {
+			color: 0x558800
+		} );
+		this.materials.floor4 = new THREE.MeshLambertMaterial( {
+			color: 0x447700
+		} );
 
 	}
 
