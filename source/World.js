@@ -20,6 +20,7 @@ module.exports = class {
 
 		this.setupRenderer();
 		this.setupLighting();
+		this.playMusic();
 
 		this.taskManager.start();
 		this.materialManager.load().then( () => {
@@ -42,6 +43,8 @@ module.exports = class {
 		this.cameraManager = new CameraManager( this );
 		this.modelManager = new ModelManager( this );
 		this.materialManager = new MaterialManager( this );
+
+		this.playingSounds = {};
 
 		this.scene = new THREE.Scene();
 
@@ -152,6 +155,7 @@ module.exports = class {
 		var drop = this.getDrop( pos );
 		if ( drop >= 0 ) {
 
+			this.playSound( 'spew.wav' );
 			this.getTile( pos.x, pos.z ).blocks.push( new Struct( this, pos ) );
 			return true;
 
@@ -177,6 +181,25 @@ module.exports = class {
 
 		return this.tiles[ x ][ z ];
 
+	}
+
+	playSound( sound ) {
+
+		var id = sound + _.now();
+
+		this.playingSounds[ id ] = new Audio( 'lib/audio/' + sound );
+		this.playingSounds[ id ].onended = () => {
+			delete this.playingSounds[ id ];
+		};
+		this.playingSounds[ id ].play();
+
+	}
+
+	playMusic() {
+
+		this.music = new Audio( 'lib/audio/music.wav' );
+		this.music.loop = true;
+		this.music.play();
 	}
 
 	getPickup( pos ) {

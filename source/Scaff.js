@@ -77,6 +77,8 @@ module.exports = class {
 
 		this.state = this.MOVING;
 
+		this.world.playSound( 'move.wav' );
+
 		var modZ = Math.round( ( this.mesh.rotation.x / Math.PI * 2 ) ) % 4;
 		var rZ = [ -x, x, x, -x ][ modZ ];
 
@@ -127,6 +129,7 @@ module.exports = class {
 		var pickup = this.world.getPickup( this.mesh.position );
 		if ( pickup ) {
 
+			this.world.playSound( 'pickup.wav' );
 			this.setMetal( this.metal + 5 );
 			pickup.destroy();
 
@@ -157,6 +160,7 @@ module.exports = class {
 		this.targetPosition = new THREE.Vector3( 0, 1, 0 );
 
 		this.state = this.JUMPING;
+		this.world.playSound( 'jump.wav' );
 
 		var lerp = new Lerper( this.world.taskManager, this.speed, value => {
 
@@ -209,6 +213,8 @@ module.exports = class {
 		}, () => {
 
 			this.state = this.STOPPED;
+			this.checkPickup();
+			this.world.playSound( 'land.wav' );
 
 		} );
 		lerp.start();
