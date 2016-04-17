@@ -1,17 +1,14 @@
 'use strict';
 
+var MovingObject = require( './MovingObject' );
 var Lerper = require( './Lerper' );
 
-module.exports = class {
+module.exports = class extends MovingObject {
 
 	constructor( world ) {
 
-		this.STOPPED = 0;
-		this.MOVING = 1;
-		this.JUMPING = 2;
-		this.FALLING = 3;
+		super();
 
-		this.state = this.STOPPED;
 		this.spewing = false;
 
 		this.world = world;
@@ -65,37 +62,14 @@ module.exports = class {
 
 	move( x, z ) {
 
-		if ( this.state !== this.STOPPED ) return;
+		this.doMove( x, z, ( value ) => {
 
-		this.position = this.mesh.position.clone();
-		this.rotation = this.mesh.rotation.clone();
-		var moveIn = new THREE.Vector3( x, 0, z );
-
-		var target = this.position.clone().add( moveIn );
-		var drop = this.world.getDrop( target );
-		if ( drop < 0 ) return;
-
-		this.state = this.MOVING;
-
-		this.world.playSound( 'move.wav' );
-
-		var modZ = Math.round( ( this.mesh.rotation.x / Math.PI * 2 ) ) % 4;
-		var rZ = [ -x, x, x, -x ][ modZ ];
-
-		this.targetRotation = new THREE.Vector3( z, 0, rZ );
-
-		var lerp = new Lerper( this.world.taskManager, this.speed, value => {
-
-			this.mesh.position.copy( this.position.clone().add( moveIn.clone().multiplyScalar( value ) ) );
 			this.mesh.rotation.x = this.rotation.x + this.targetRotation.x * value * Math.PI / 2;
 			this.mesh.rotation.y = this.rotation.y + this.targetRotation.y * value * Math.PI / 2;
 			this.mesh.rotation.z = this.rotation.z + this.targetRotation.z * value * Math.PI / 2;
 			this.world.cameraManager.updatePosition();
 
-
 		}, () => {
-
-			this.state = this.STOPPED;
 
 			if ( this.spewing && this.metal > 0 ) {
 
@@ -104,9 +78,6 @@ module.exports = class {
 				if ( placed ) {
 					this.setMetal( this.metal - 1 );
 				}
-				// Mark tile
-				this.world.markTile( this.mesh.position.x, this.mesh.position.z );
-
 			}
 
 			if ( this.metal === 0 ) {
@@ -117,10 +88,13 @@ module.exports = class {
 
 			// Check for below
 			this.checkPickup();
-			this.fall();
+
+		}, () => {
+
+			this.checkPickup();
+			this.world.playSound( 'land.wav' );
 
 		} );
-		lerp.start();
 
 	}
 
@@ -179,42 +153,6 @@ module.exports = class {
 			if ( placed ) {
 				this.setMetal( this.metal - 1 );
 			}
-
-			// Mark tile
-			this.world.markTile( this.mesh.position.x, this.mesh.position.z );
-
-		} );
-		lerp.start();
-
-	}
-
-	fall() {
-
-		var drop = this.world.getDrop( this.mesh.position );
-
-		if ( drop <= 0 ) return;
-
-		var acceleration = 40;
-
-		var duration = Math.sqrt( 2 * drop / acceleration ) * 1000;
-
-		this.state = this.FALLING;
-		this.position = this.mesh.position.clone();
-		this.targetPosition = new THREE.Vector3( 0, -drop, 0 );
-
-		var lerp = new Lerper( this.world.taskManager, duration, value => {
-
-			var height = Math.pow( value, 2 );
-
-			this.mesh.position.copy( this.position.clone().add( this.targetPosition.clone().multiplyScalar( height ) ) );
-			this.world.cameraManager.updatePosition();
-
-
-		}, () => {
-
-			this.state = this.STOPPED;
-			this.checkPickup();
-			this.world.playSound( 'land.wav' );
 
 		} );
 		lerp.start();

@@ -71,9 +71,6 @@ module.exports = class {
 		var lavaMaterial = new THREE.MeshLambertMaterial( {
 			color: 0xfd2d6d
 		} );
-		this.hoverMaterial = new THREE.MeshLambertMaterial( {
-			color: 0x3dfd6d
-		} );
 
 		this.tiles = [];
 
@@ -135,6 +132,10 @@ module.exports = class {
 	getDrop( pos ) {
 
 		var tile = this.getTile( pos.x, pos.z );
+
+		if ( !tile ) {
+			return -Infinity;
+		}
 		var low = tile.height;
 		_.each( tile.blocks, object => {
 
@@ -179,6 +180,10 @@ module.exports = class {
 
 	getTile( x, z ) {
 
+		if ( !this.tiles[ x ] ) {
+			return;
+		}
+
 		return this.tiles[ x ][ z ];
 
 	}
@@ -191,7 +196,7 @@ module.exports = class {
 		this.playingSounds[ id ].onended = () => {
 			delete this.playingSounds[ id ];
 		};
-		this.playingSounds[ id ].play();
+		// this.playingSounds[ id ].play();
 
 	}
 
@@ -199,7 +204,7 @@ module.exports = class {
 
 		this.music = new Audio( 'lib/audio/music.wav' );
 		this.music.loop = true;
-		this.music.play();
+		// this.music.play();
 	}
 
 	getPickup( pos ) {
@@ -221,9 +226,9 @@ module.exports = class {
 
 	}
 
-	markTile( x, z ) {
+	markTile( x, z, mark ) {
 
-		this.tiles[ x ][ z ].mesh.material = this.hoverMaterial;
+		this.tiles[ x ][ z ].mesh.material = this.materialManager.get( mark );
 
 	}
 

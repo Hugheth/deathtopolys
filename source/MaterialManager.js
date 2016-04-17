@@ -16,12 +16,22 @@ module.exports = class {
 
 	load() {
 
+		this.loadStatic();
+
 		return Promise.all( [
 
 			this.loadTexture( 'lava' ),
 			this.loadTexture( 'policeTemplate', 'png' )
 
 		] );
+
+	}
+
+	loadStatic() {
+
+		this.materials.police = new THREE.MeshLambertMaterial( {
+			color: 0x3d73ed
+		} );
 
 	}
 
