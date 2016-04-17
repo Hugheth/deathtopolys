@@ -4,11 +4,13 @@ var TaskManager = require( './TaskManager' );
 var KeyManager = require( './KeyManager' );
 var CameraManager = require( './CameraManager' );
 var ModelManager = require( './ModelManager' );
+var MaterialManager = require( './MaterialManager' );
 var Skybox = require( './Skybox' );
 // var Terrain = require( './Terrain' );
 var Scaff = require( './Scaff' );
 var Struct = require( './Struct' );
 var Junk = require( './Junk' );
+var Police = require( './Police' );
 
 module.exports = class {
 
@@ -20,7 +22,11 @@ module.exports = class {
 		this.setupLighting();
 
 		this.taskManager.start();
-		this.modelManager.load().then( () => {
+		this.materialManager.load().then( () => {
+
+			return this.modelManager.load();
+
+		} ).then( () => {
 
 			this.initModels();
 			this.animate();
@@ -35,6 +41,7 @@ module.exports = class {
 		this.keyManager = new KeyManager( this );
 		this.cameraManager = new CameraManager( this );
 		this.modelManager = new ModelManager( this );
+		this.materialManager = new MaterialManager( this );
 
 		this.scene = new THREE.Scene();
 
@@ -43,6 +50,13 @@ module.exports = class {
 
 		this.SIZE = 1;
 		this.HEIGHT = 10;
+
+		this.skybox = new Skybox( this, 'skybox-' );
+		this.scene.add( this.skybox.mesh );
+
+	}
+
+	initModels() {
 
 		var geometry = new THREE.BoxBufferGeometry( this.SIZE, this.SIZE * this.HEIGHT, this.SIZE );
 		var darkCubeMaterial = new THREE.MeshLambertMaterial( {
@@ -68,7 +82,7 @@ module.exports = class {
 
 				var height = Math.floor( Math.pow( Math.random(), 6 ) * 3 );
 
-				var mesh = new THREE.Mesh( geometry, Math.random() > 0.8 ? lavaMaterial : ( ( x + z ) % 2 ? darkCubeMaterial : darkCubeMaterial2 ) );
+				var mesh = new THREE.Mesh( geometry, Math.random() > 0.8 ? this.materialManager.get( 'lava' ) : ( ( x + z ) % 2 ? darkCubeMaterial : darkCubeMaterial2 ) );
 				mesh.position.x = x * this.SIZE;
 				mesh.position.z = z * this.SIZE;
 				mesh.position.y = height - 0.1 * ( ( x + z ) % 2 ) - this.HEIGHT / 2 - 0.5;
@@ -89,25 +103,29 @@ module.exports = class {
 
 		}
 
-		this.skybox = new Skybox( this, 'skybox-' );
-		this.scene.add( this.skybox.mesh );
-
-	}
-
-	initModels() {
-
-		this.scaff = new Scaff( this );
-
 		var i = 0;
 		while ( i < 20 ) {
 
-			var pos = new THREE.Vector3( Math.floor( Math.random() * 32 ), 10, Math.floor( Math.random() * 32 ) );
+			let pos = new THREE.Vector3( Math.floor( Math.random() * 32 ), 10, Math.floor( Math.random() * 32 ) );
 			pos.y = this.getTile( pos.x, pos.z ).height;
 
 			this.addJunk( pos );
 			i++;
 
 		}
+
+		var j = 0;
+		while ( j < 20 ) {
+
+			let pos = new THREE.Vector3( Math.floor( Math.random() * 32 ), 10, Math.floor( Math.random() * 32 ) );
+			pos.y = this.getTile( pos.x, pos.z ).height;
+
+			this.addPolice( pos );
+			j++;
+
+		}
+
+		this.scaff = new Scaff( this );
 
 	}
 
@@ -146,6 +164,12 @@ module.exports = class {
 	addJunk( pos ) {
 
 		this.getTile( pos.x, pos.z ).pickups.push( new Junk( this, pos ) );
+
+	}
+
+	addPolice( pos ) {
+
+		this.getTile( pos.x, pos.z ).blocks.push( new Police( this, pos ) );
 
 	}
 

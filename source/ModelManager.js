@@ -13,7 +13,8 @@ module.exports = class {
 
 		return Promise.all( [
 			this.loadModel( 'scaff' ),
-			this.loadModel( 'junk' )
+			this.loadModel( 'junk' ),
+			this.loadModel( 'police' )
 		] );
 
 	}
