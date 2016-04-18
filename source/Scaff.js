@@ -20,7 +20,7 @@ module.exports = class extends MovingObject {
 		this.UP = [ 38, 'W' ];
 		this.RIGHT = [ 39, 'D' ];
 		this.DOWN = [ 40, 'S' ];
-		this.SPACE = [ 32 ];
+		this.SPACE = [ 32, 16 ];
 
 		this.initMesh();
 		this.initKeys();

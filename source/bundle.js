@@ -64053,7 +64053,7 @@
 				'You have reached a city ruled by devious junk smugglers...',
 				'Good thing too because you were running out!',
 				'Use WASD to move...',
-				'Press SPACEBAR to jump',
+				'Press SPACEBAR to jump<br><small>- or SHIFT (srsly Ludum?!)</small>',
 				"O sorry I forgot! You can build more scaffold.<br><small>(You're like a metal spider)</small>",
 				'See that junk over there? Go pick it up!',
 				'MMMMM Tasty. And shiny too.<br><small>(Cheers THREE.MeshPhongMaterial)</small>',
@@ -64344,7 +64344,7 @@
 			this.UP = [ 38, 'W' ];
 			this.RIGHT = [ 39, 'D' ];
 			this.DOWN = [ 40, 'S' ];
-			this.SPACE = [ 32 ];
+			this.SPACE = [ 32, 16 ];
 	
 			this.initMesh();
 			this.initKeys();
