@@ -471,6 +471,9 @@ module.exports = class {
 		var currentPickup;
 
 		var tile = this.getTile( pos.x, pos.z );
+		if ( !tile ) {
+			return;
+		}
 		_.each( tile.pickups, pickup => {
 
 			if ( pickup.position.y == pos.y ) {
@@ -488,6 +491,9 @@ module.exports = class {
 	markTile( x, z, mark ) {
 
 		var tile = this.getTile( x, z );
+		if ( !tile ) {
+			return;
+		}
 		tile.mesh.material = this.materialManager.get( mark );
 		tile.mark = mark;
 
@@ -536,6 +542,10 @@ module.exports = class {
 		var block;
 
 		var tile = this.getTile( pos.x, pos.z );
+
+		if ( !tile ) {
+			return;
+		}
 		_.each( tile.blocks, object => {
 
 			if ( object.position.y === pos.y ) {
