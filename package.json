@@ -1,15 +1,17 @@
 {
-  "name": "deathToPolys",
+  "name": "polys",
   "version": "0.0.1",
   "description": "A Ludum Dare submission",
   "main": "source/main.js",
   "dependencies": {
-    "jquery": "^2.2.3",
-    "lodash": "^3.10.1",
     "three": "^0.75.0"
   },
   "engines": {
-    "node": "5.0.0"
+    "node": "24"
+  },
+  "scripts": {
+    "dev": "vite dev",
+    "build": "vite build"
   },
   "repository": {
     "type": "git",
@@ -22,9 +24,8 @@
   ],
   "license": "MIT",
   "devDependencies": {
-    "gulp": "^3.9.1",
-    "orbit-controls": "^1.0.4",
-    "webpack": "^1.12.14",
-    "webpack-dev-server": "^1.14.1"
+    "typescript": "5.8.3",
+		"vite": "^7.1.0",
+    "@types/three": "^0.179.0"
   }
 }

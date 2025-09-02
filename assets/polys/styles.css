@@ -9,7 +9,7 @@ body {
   margin: 0px;
   overflow: hidden;
 }
-#info {
+#polys-info {
   position: absolute;
   top: 0px; width: 100%;
   padding: 5px;
@@ -17,7 +17,7 @@ body {
 a {
   color: #a06851;
 }
-#hud {
+#polys-hud {
 	position: absolute;
 	font-size: 20px;
 	color: #fff;
@@ -28,7 +28,7 @@ a {
 	padding: 10px;
 }
 
-#hud > * {
+#polys-hud > * {
 
 	float: left;
 	margin-right: 20px;
@@ -50,7 +50,7 @@ a {
 
 }
 
-#tutorial {
+#polys-tutorial {
 	position: absolute;
     bottom: 60px;
     width: 80%;
@@ -63,7 +63,7 @@ a {
     font-size: 20px;
 }
 
-#finalScore {
+#polys-finalScore {
 
 	position: absolute;
 	display: none;
