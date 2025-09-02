@@ -445,7 +445,6 @@ export class World {
 	dispose() {
 		this.alive = false;
 		this.renderer.dispose();
-		this.scene.clear();
 		this.keyManager.destroy();
 	}
 }
