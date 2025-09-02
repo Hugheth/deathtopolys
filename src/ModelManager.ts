@@ -12,8 +12,9 @@ export class ModelManager {
 		]);
 	}
 
-	get(name: string): THREE.Object3D | undefined {
-		return this.models[name];
+	get(name: string): THREE.BufferGeometry | undefined {
+		const geometry = this.models[name].geometry;
+		return geometry;
 	}
 
 	loadModel(name: string): Promise<void> {
@@ -22,7 +23,6 @@ export class ModelManager {
 			loader.load(
 				'/assets/polys/models/' + name + '.json',
 				(object: THREE.Object3D) => {
-					console.log('NICE', object);
 					this.models[name] = object;
 					fulfil();
 				},

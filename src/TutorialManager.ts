@@ -38,7 +38,7 @@ export class TutorialManager {
 		}
 
 		window.addEventListener('keydown', e => {
-			if (e.which === 13) {
+			if (e.which == 13) {
 				// Enter key
 				this.next();
 			}

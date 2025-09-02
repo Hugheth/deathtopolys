@@ -27,21 +27,12 @@
 			"depthWrite": true
 		}],
 	"object": {
-		"uuid": "180C3D18-1D20-4DB6-BE87-95AAF0B404E7",
-		"type": "Scene",
-		"name": "Scene",
+		"uuid": "C0605662-1D39-4891-B11D-B38CA13A9789",
+		"type": "Mesh",
+		"name": "junk.json",
 		"layers": 1,
 		"matrix": [1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1],
-		"children": [
-			{
-				"uuid": "C0605662-1D39-4891-B11D-B38CA13A9789",
-				"type": "Mesh",
-				"name": "junk.json",
-				"layers": 1,
-				"matrix": [1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1],
-				"geometry": "BA097330-0781-42E8-BE2E-159E4723DB57",
-				"material": "BD51223C-4F01-41C9-8A28-41AA90F7AB08"
-			}],
-		"background": 11184810
+		"geometry": "BA097330-0781-42E8-BE2E-159E4723DB57",
+		"material": "BD51223C-4F01-41C9-8A28-41AA90F7AB08"
 	}
 }

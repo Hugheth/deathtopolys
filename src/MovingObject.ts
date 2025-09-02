@@ -18,13 +18,14 @@ export default class MovingObject {
 	];
 
 	state: number = this.STOPPED;
-	position?: Three.Vector3;
+	position!: Three.Vector3;
 	rotation?: Three.Euler;
 	mesh!: Three.Mesh;
 	rigid?: boolean;
 	speed!: number;
 	targetRotation?: Three.Vector3;
 	targetPosition?: Three.Vector3;
+	type!: string;
 
 	constructor(public world: World) {}
 
@@ -35,7 +36,7 @@ export default class MovingObject {
 		onMoved: (unstable: boolean) => void,
 		onFall: () => void,
 	): void {
-		if (this.state !== this.STOPPED) return;
+		if (this.state != this.STOPPED) return;
 
 		this.position = this.mesh.position.clone();
 		this.rotation = this.mesh.rotation.clone();
@@ -110,4 +111,6 @@ export default class MovingObject {
 		);
 		lerp.start();
 	}
+
+	destroy() {}
 }

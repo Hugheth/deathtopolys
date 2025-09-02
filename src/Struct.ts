@@ -25,4 +25,6 @@ export class Struct {
 		this.mesh.position.copy(this.position);
 		this.world.scene.add(this.mesh);
 	}
+
+	destroy(): void {}
 }

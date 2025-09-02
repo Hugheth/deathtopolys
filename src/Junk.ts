@@ -23,10 +23,10 @@ export class Junk {
 		this.world.scene.add(this.mesh);
 	}
 
-	animate(frame: number) {
+	animate = (frame: number) => {
 		this.mesh.rotation.y += 0.1;
 		this.mesh.position.y = this.position.y + Math.sin(frame / 10 + this.animateOffset) * 0.2;
-	}
+	};
 
 	destroy() {
 		this.world.taskManager.removeTask(this.animate);

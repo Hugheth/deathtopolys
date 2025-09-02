@@ -5,7 +5,9 @@ import { World } from './World';
 export interface Block {
 	type: string;
 	mesh: Three.Mesh;
+	position: Three.Vector3;
 	destroy(): void;
+	mark?: string;
 }
 
 export interface Tile {
@@ -13,6 +15,7 @@ export interface Tile {
 	height: number;
 	blocks: Block[];
 	pickups: Junk[];
+	mark?: string;
 }
 
 export class Terrain {
@@ -32,7 +35,7 @@ export class Terrain {
 
 		this.raiseTile(x, z);
 
-		if (frame % 1000 === 0) {
+		if (frame % 1000 == 0) {
 			this.placePolice();
 		}
 	}
@@ -44,7 +47,7 @@ export class Terrain {
 			const z = Math.floor(Math.random() * this.world.depth);
 
 			const tile = this.world.getTile(x, z);
-			if (tile.mark !== 'saved') {
+			if (tile.mark != 'saved') {
 				this.world.addPolice(new Three.Vector3(x, 0, z));
 				break;
 			}
@@ -54,11 +57,11 @@ export class Terrain {
 	raiseTile(x: number, z: number): void {
 		const tile = this.world.getTile(x, z);
 
-		if (tile.mark === 'saved') return;
+		if (tile.mark == 'saved') return;
 		if (tile.height > 8) return;
 
-		if (tile.pickups.length === 0 && tile.blocks.length === 0) {
-			if (tile.height === 0) {
+		if (tile.pickups.length == 0 && tile.blocks.length == 0) {
+			if (tile.height == 0) {
 				tile.mesh.geometry = this.world.modelManager.get('tower');
 			}
 

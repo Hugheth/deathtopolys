@@ -10,9 +10,8 @@ export class Police extends MovingObject {
 	animateOffset: number;
 	dead?: boolean;
 
-	constructor(world: World, position: THREE.Vector3) {
+	constructor(world: World, public position: THREE.Vector3) {
 		super(world);
-		this.position = position;
 		this.initMesh();
 		this.animateOffset = Math.random() * Math.PI * 2;
 		this.animate = this.animate.bind(this);

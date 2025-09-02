@@ -7,11 +7,11 @@ export class Scaff extends MovingObject {
 	spewing: boolean = false;
 	metal = 0;
 	speed = 300;
-	LEFT: string[] = ['Left', 'A'];
-	UP: string[] = ['Up', 'W'];
-	RIGHT: string[] = ['Right', 'D'];
-	DOWN: string[] = ['Down', 'S'];
-	SPACE: string[] = ['Space'];
+	LEFT: string[] = ['ArrowLeft', 'a'];
+	UP: string[] = ['ArrowUp', 'w'];
+	RIGHT: string[] = ['ArrowRight', 'd'];
+	DOWN: string[] = ['ArrowDown', 's'];
+	SPACE: string[] = [' '];
 	dead: boolean = false;
 
 	constructor(world: World) {
@@ -83,7 +83,7 @@ export class Scaff extends MovingObject {
 					}
 				}
 
-				if (this.metal === 0) {
+				if (this.metal == 0) {
 					this.spewing = false;
 				}
 
@@ -96,7 +96,7 @@ export class Scaff extends MovingObject {
 
 				const block = this.world.getBlock(beneath);
 
-				if (block && block.type === 'struct' && block.mask !== 'police') {
+				if (block && block.type == 'struct' && block.mark != 'police') {
 					this.world.checkStructForRing(block);
 				}
 			},
@@ -135,11 +135,11 @@ export class Scaff extends MovingObject {
 	spew(): void {
 		if (this.dead) return;
 
-		if (this.state !== this.STOPPED || this.spewing) {
+		if (this.state != this.STOPPED || this.spewing) {
 			return;
 		}
 
-		if (this.metal === 0) return;
+		if (this.metal == 0) return;
 
 		this.spewing = true;
 
@@ -194,7 +194,7 @@ export class Scaff extends MovingObject {
 
 		const mark = this.world.getDropMark(this.position);
 
-		if (mark === 'police') {
+		if (mark == 'police') {
 			this.world.playSound('gameover.wav');
 			this.dead = true;
 			const containerElement = document.getElementById('polys-container');

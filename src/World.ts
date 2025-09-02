@@ -5,7 +5,7 @@ import { CameraManager } from './CameraManager';
 import { ModelManager } from './ModelManager';
 import { MaterialManager } from './MaterialManager';
 import { TutorialManager } from './TutorialManager';
-import { Terrain } from './Terrain';
+import { Block, Terrain } from './Terrain';
 import { Skybox } from './Skybox';
 import { Scaff } from './Scaff';
 import { Struct } from './Struct';
@@ -20,11 +20,11 @@ export class World {
 
 	estate = 0;
 	towerTasks = new Map<number, Three.Vector3[]>();
-	taskManager = new TaskManager(this);
+	taskManager = new TaskManager();
 	keyManager = new KeyManager(this);
 	cameraManager = new CameraManager(this);
-	modelManager = new ModelManager(this);
-	materialManager = new MaterialManager(this);
+	modelManager = new ModelManager();
+	materialManager = new MaterialManager();
 	tutorialManager = new TutorialManager(this);
 	renderer = new Three.WebGLRenderer({
 		antialias: true,
@@ -43,15 +43,15 @@ export class World {
 	HEIGHT = 10;
 
 	mute = false;
-	music = new Audio('lib/audio/music.mp3');
+	music = new Audio('/assets/polys/audio/music.mp3');
 
-	skybox = new Skybox(this, 'skybox-');
+	skybox = new Skybox(this);
 	sun = new Three.DirectionalLight(0xffffef, 1);
 	shadowSun = new Three.DirectionalLight('#2c2c5c', 1);
 	ambient = new Three.AmbientLight('#3d3d3d');
 
-	terrain = new Terrain(this);
-	scaff = new Scaff(this);
+	terrain?: Terrain;
+	scaff?: Scaff;
 
 	constructor() {
 		this.scene.add(this.skybox.mesh);
@@ -67,6 +67,8 @@ export class World {
 				return this.modelManager.load();
 			})
 			.then(() => {
+				this.terrain = new Terrain(this);
+				this.scaff = new Scaff(this);
 				this.cameraManager.camera.position.copy(
 					this.scaff.mesh.position.clone().add(this.cameraManager.offset),
 				);
@@ -88,10 +90,10 @@ export class World {
 					this.addJunk(position);
 					const timeToNext =
 						frame + Math.floor(Math.random() * 1000) + 1000 - position.y * 200;
-					if (!this.towerTasks[timeToNext]) {
-						this.towerTasks[timeToNext] = [];
+					if (!this.towerTasks.get(timeToNext)) {
+						this.towerTasks.set(timeToNext, []);
 					}
-					this.towerTasks[timeToNext].push(position);
+					this.towerTasks.get(timeToNext)!.push(position);
 				}
 			}
 			this.towerTasks.delete(frame);
@@ -129,7 +131,7 @@ export class World {
 		}
 	}
 
-	checkStructForRing(struct: Struct) {
+	checkStructForRing(struct: Block) {
 		const rings: Ring[] = [];
 		const pos = struct.position;
 		let vPos = pos.clone();
@@ -209,12 +211,12 @@ export class World {
 
 			let area = 0;
 
-			while (currentPos.x !== ring[1].x + vX) {
+			while (currentPos.x != ring[1].x + vX) {
 				currentPos.z = ring[0].z;
 
-				while (currentPos.z !== ring[1].z + vZ) {
+				while (currentPos.z != ring[1].z + vZ) {
 					const block = this.getBlock(currentPos);
-					if (block && block.type === 'struct') {
+					if (block && block.type == 'struct') {
 						block.mesh.material = this.materialManager.get('saved');
 						block.mark = 'saved';
 					}
@@ -223,7 +225,7 @@ export class World {
 
 					this.destroyPolice(currentPos);
 
-					if (tile.mark !== 'saved') {
+					if (tile.mark != 'saved') {
 						tile.mark = 'saved';
 						this.estate++;
 						foundNew = true;
@@ -231,12 +233,12 @@ export class World {
 						if (tile.height) {
 							tile.mesh.material = this.materialManager.get('saved');
 							const time = this.taskManager.frame + Math.floor(Math.random() * 200);
-							if (!this.towerTasks[time]) {
-								this.towerTasks[time] = [];
+							if (!this.towerTasks.get(time)) {
+								this.towerTasks.set(time, []);
 							}
-							this.towerTasks[time].push(
-								new Three.Vector3(currentPos.x, tile.height, currentPos.z),
-							);
+							this.towerTasks
+								.get(time)
+								?.push(new Three.Vector3(currentPos.x, tile.height, currentPos.z));
 						} else if ((currentPos.x + currentPos.z) % 2) {
 							tile.mesh.material = this.materialManager.get('floor3');
 						} else {
@@ -252,7 +254,7 @@ export class World {
 				currentPos.x += vX;
 			}
 
-			if (area === this.width * this.depth) {
+			if (area == this.width * this.depth) {
 				alert('YOU WON!');
 			}
 		}
@@ -272,7 +274,7 @@ export class World {
 	) {
 		const vPos = outPos.clone();
 
-		while (vPos.x !== pos.x) {
+		while (vPos.x != pos.x) {
 			vPos.x -= vX;
 			if (!this.hasGoodStruct(vPos)) {
 				return;
@@ -281,7 +283,7 @@ export class World {
 			// console.log( 'good at', vPos );
 		}
 
-		while (vPos.z !== pos.z) {
+		while (vPos.z != pos.z) {
 			vPos.z -= vZ;
 			if (!this.hasGoodStruct(vPos)) {
 				return;
@@ -297,7 +299,7 @@ export class World {
 	destroyPolice(pos: Three.Vector3) {
 		const tile = this.getTile(pos.x, pos.z);
 		for (const object of tile.blocks) {
-			if (object.type === 'police') {
+			if (object.type == 'police') {
 				object.destroy();
 			}
 		}
@@ -320,7 +322,7 @@ export class World {
 
 		if (this.mute) return;
 
-		this.playingSounds[id] = new Audio('lib/audio/' + sound);
+		this.playingSounds[id] = new Audio('/assets/polys/audio/' + sound);
 		this.playingSounds[id].onended = () => {
 			delete this.playingSounds[id];
 		};
@@ -391,26 +393,21 @@ export class World {
 	hasGoodStruct(pos: Three.Vector3) {
 		const block = this.getBlock(pos);
 
-		if (block && block.type === 'struct' && block.mark !== 'police') {
+		if (block && block.type == 'struct' && block.mark != 'police') {
 			return true;
 		}
 	}
 
-	getBlock(pos: Three.Vector3) {
-		let block: Tile | undefined;
-
+	getBlock(pos: Three.Vector3): Block | undefined {
 		const tile = this.getTile(pos.x, pos.z);
 		if (!tile) {
 			return;
 		}
 		for (const object of tile.blocks) {
-			if (object.position.y === pos.y) {
-				block = object;
-				return false;
+			if (object.position.y == pos.y) {
+				return object;
 			}
 		}
-
-		return block;
 	}
 
 	onWindowResize = () => {
@@ -449,5 +446,6 @@ export class World {
 		this.alive = false;
 		this.renderer.dispose();
 		this.scene.clear();
+		this.keyManager.destroy();
 	}
 }

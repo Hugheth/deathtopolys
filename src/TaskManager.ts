@@ -23,7 +23,7 @@ export class TaskManager {
 
 			const output = task(this.frame, delta);
 
-			if (output !== false) {
+			if (output != false) {
 				newTasks.push(task);
 			}
 		});
@@ -48,7 +48,7 @@ export class TaskManager {
 	}
 
 	stop(): void {
-		if (this.animationFrameId !== null) {
+		if (this.animationFrameId != null) {
 			cancelAnimationFrame(this.animationFrameId);
 			this.animationFrameId = null;
 		}
@@ -58,14 +58,14 @@ export class TaskManager {
 		beforeTask: ((frame: number, delta: number) => any)[],
 		callback: (frame: number, delta: number) => any,
 	): void {
-		if (typeof callback !== 'function') {
+		if (typeof callback != 'function') {
 			console.warn('Missing callback', callback);
 			return;
 		}
 
 		const index = beforeTask.indexOf(callback);
 
-		if (index === -1) {
+		if (index == -1) {
 			this.tasks.push(callback);
 		} else {
 			this.tasks.splice(index, 0, callback);
@@ -75,7 +75,7 @@ export class TaskManager {
 	addTask(
 		callback: (frame: number, delta: number) => any,
 	): (frame: number, delta: number) => any | void {
-		if (typeof callback !== 'function') {
+		if (typeof callback != 'function') {
 			console.warn('Missing callback', callback);
 			return;
 		}
@@ -86,7 +86,7 @@ export class TaskManager {
 		}
 
 		const index = this.tasks.indexOf(callback);
-		if (index !== -1) {
+		if (index != -1) {
 			console.warn("Can't add duplicate task ", callback);
 			return;
 		}
@@ -96,7 +96,7 @@ export class TaskManager {
 	}
 
 	removeTask(callback: (frame: number, delta: number) => any): void {
-		if (callback === this.currentTask) {
+		if (callback == this.currentTask) {
 			this.currentTask = null;
 		}
 
@@ -107,7 +107,7 @@ export class TaskManager {
 
 		const index = this.tasks.indexOf(callback);
 
-		if (index !== -1) {
+		if (index != -1) {
 			this.tasks.splice(index, 1);
 		}
 	}

@@ -10,24 +10,13 @@ export class KeyManager {
 	keys = new Map<string, boolean>();
 	keyTasks = new Map<string, KeyData>();
 	constructor(public world: World) {
-		const container = document.getElementById('polys-container');
-		container.addEventListener('keydown', e => {
-			this.addTask(e.key);
-		});
-		container.addEventListener('keyup', e => {
-			this.removeTask(e.key);
-		});
-		container.addEventListener('blur', () => {
-			for (const [key, keyDown] of this.keys) {
-				if (keyDown) {
-					this.removeTask(key);
-				}
-			}
-			this.keys.clear();
-		});
+		window.addEventListener('keydown', this.addTask);
+		window.addEventListener('keyup', this.removeTask);
+		window.addEventListener('blur', this.blur);
 	}
 
-	addTask(key: string) {
+	addTask = (e: { key: string }) => {
+		const key = e.key;
 		const keyDown = this.keys.get(key),
 			keyData = this.keyTasks.get(key);
 
@@ -39,9 +28,10 @@ export class KeyManager {
 			this.world.taskManager.addTask(keyData.onPressing);
 		}
 		this.keys.set(key, true);
-	}
+	};
 
-	removeTask(key: string) {
+	removeTask = (e: { key: string }) => {
+		const key = e.key;
 		var keyDown = this.keys.get(key),
 			keyData = this.keyTasks.get(key);
 
@@ -53,7 +43,16 @@ export class KeyManager {
 			this.world.taskManager.removeTask(keyData.onPressing);
 		}
 		this.keys.set(key, false);
-	}
+	};
+
+	blur = () => {
+		for (const [key, keyDown] of this.keys) {
+			if (keyDown) {
+				this.removeTask({ key });
+			}
+		}
+		this.keys.clear();
+	};
 
 	addKeyBinding(
 		input: string | string[],
@@ -69,5 +68,11 @@ export class KeyManager {
 				onRelease: onRelease,
 			});
 		}
+	}
+
+	destroy() {
+		window.removeEventListener('keydown', this.addTask);
+		window.removeEventListener('keyup', this.removeTask);
+		window.removeEventListener('blur', this.blur);
 	}
 }
